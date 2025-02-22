@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Склад 2025</string>
+    <string name="action_settings">Настройки</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="action_login">Войти</string>
+    <string name="empty_error">Логин и Пароль не должны быть пустыми</string>
+    <string name="alertDialogErrorTitle">Ошибка</string>
+    <string name="OK">ОК</string>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/auth_fragment">
+    <fragment
+        android:id="@+id/auth_fragment"
+        android:name="ru.altrimo.slad2025.fragment.AuthFragment"
+        android:label="AuthFragment"
+        tools:layout="@layout/auth_fragment">
+        <action
+            android:id="@+id/action_auth_to_doc_list"
+            app:destination="@id/doc_list_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/doc_list_fragment"
+        android:name="ru.altrimo.slad2025.fragment.doclist.DocListFragment"
+        android:label="DocList"
+        tools:layout="@layout/doc_list_fragment" />
+</navigation>
