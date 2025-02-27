@@ -1,13 +1,13 @@
 package ru.altrimo.slad2025.fragment.doclist
 
 
-import ru.altrimo.slad2025.databinding.DocItemHolderBinding
+import ru.altrimo.slad2025.databinding.ItemDocBinding
 import ru.altrimo.slad2025.fragment.base.SimpleListAdapter
 import ru.altrimo.slad2025.network.responce.DocItem
 import java.util.Locale
 
 class DocItemHolder(
-    private val binding: DocItemHolderBinding,
+    private val binding: ItemDocBinding,
     private val onClicked: (item: DocItem) -> Unit
 ) : SimpleListAdapter.ViewHolder<DocItem>(binding.root) {
 

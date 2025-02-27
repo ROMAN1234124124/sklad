@@ -5,18 +5,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.altrimo.slad2025.network.request.DocListRequest
 import ru.altrimo.slad2025.network.responce.DocItem
 import ru.altrimo.slad2025.repository.DocListRepository
 import ru.altrimo.slad2025.viewmodel.base.BaseViewModel
 import ru.altrimo.slad2025.viewmodel.base.RESULT_OK
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class DocListViewModel @Inject constructor(
-    private val docListRepository: DocListRepository,
-    @Named("device") private var device: String
+    private val repository: DocListRepository
 ) : BaseViewModel() {
 
     val viewResult = MutableLiveData<List<DocItem>>()
@@ -29,12 +26,7 @@ class DocListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             runCatching {
                 viewShowLoading.postValue(true)
-                docListRepository.docList(
-                    DocListRequest(
-                        userGUID = docListRepository.getGUID(),
-                        device = device
-                    )
-                )
+                repository.docList()
             }.onSuccess {
                 viewShowLoading.postValue(false)
                 if (it.result == RESULT_OK) {

@@ -1,4 +1,4 @@
-package ru.altrimo.slad2025.network
+package ru.altrimo.slad2025.network.base
 
 import okhttp3.ResponseBody
 

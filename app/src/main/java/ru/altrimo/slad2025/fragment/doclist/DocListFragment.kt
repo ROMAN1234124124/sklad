@@ -3,18 +3,19 @@ package ru.altrimo.slad2025.fragment.doclist
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import ru.altrimo.slad2025.databinding.DocItemHolderBinding
-import ru.altrimo.slad2025.databinding.DocListFragmentBinding
+import ru.altrimo.slad2025.databinding.FragmentDocListBinding
+import ru.altrimo.slad2025.databinding.ItemDocBinding
 import ru.altrimo.slad2025.fragment.base.SimpleListAdapter
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.network.responce.DocItem
 import ru.altrimo.slad2025.viewmodel.DocListViewModel
 
 @AndroidEntryPoint
-class DocListFragment : ViewBindingFragment<DocListFragmentBinding>() {
+class DocListFragment : ViewBindingFragment<FragmentDocListBinding>() {
 
     override val inflaterDelegate by inflaterDelegate()
     private val viewModel: DocListViewModel by viewModels()
@@ -51,13 +52,18 @@ class DocListFragment : ViewBindingFragment<DocListFragmentBinding>() {
                 override fun onCreateViewHolder(
                     parent: ViewGroup, viewType: Int
                 ): DocItemHolder {
-                    val binding = DocItemHolderBinding.inflate(
+                    val binding = ItemDocBinding.inflate(
                         LayoutInflater.from(parent.context), parent, false
                     )
                     return DocItemHolder(
                         binding
                     ) {
-
+                        findNavController().navigate(
+                            DocListFragmentDirections.actionDocListToContentDoc(
+                                docGUID = it.docGUID,
+                                docVersion = it.docVersion
+                            )
+                        )
                     }
                 }
             }

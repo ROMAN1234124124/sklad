@@ -4,12 +4,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.altrimo.slad2025.R
-import ru.altrimo.slad2025.databinding.AuthFragmentBinding
+import ru.altrimo.slad2025.databinding.FragmentAuthBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.viewmodel.AuthViewModel
 
 @AndroidEntryPoint
-class AuthFragment : ViewBindingFragment<AuthFragmentBinding>() {
+class AuthFragment : ViewBindingFragment<FragmentAuthBinding>() {
 
     override val inflaterDelegate by inflaterDelegate()
     private val viewModel: AuthViewModel by viewModels()
@@ -24,6 +24,9 @@ class AuthFragment : ViewBindingFragment<AuthFragmentBinding>() {
             } else {
                 viewModel.auth(login.toString(), password.toString())
             }
+        }
+        binding.actionSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_auth_to_setting)
         }
     }
 

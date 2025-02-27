@@ -3,19 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/auth_fragment">
+    app:startDestination="@id/authFragment">
     <fragment
-        android:id="@+id/auth_fragment"
+        android:id="@+id/authFragment"
         android:name="ru.altrimo.slad2025.fragment.AuthFragment"
         android:label="AuthFragment"
-        tools:layout="@layout/auth_fragment">
+        tools:layout="@layout/fragment_auth">
         <action
             android:id="@+id/action_auth_to_doc_list"
-            app:destination="@id/doc_list_fragment" />
+            app:destination="@id/docListFragment" />
+        <action
+            android:id="@+id/action_auth_to_setting"
+            app:destination="@id/settingFragment" />
     </fragment>
     <fragment
-        android:id="@+id/doc_list_fragment"
+        android:id="@+id/settingFragment"
+        android:name="ru.altrimo.slad2025.fragment.SettingFragment"
+        android:label="SettingFragment"
+        tools:layout="@layout/fragment_setting" />
+    <fragment
+        android:id="@+id/docListFragment"
         android:name="ru.altrimo.slad2025.fragment.doclist.DocListFragment"
-        android:label="DocList"
-        tools:layout="@layout/doc_list_fragment" />
+        android:label="DocListFragment"
+        tools:layout="@layout/fragment_doc_list">
+        <action
+            android:id="@+id/action_docList_to_contentDoc"
+            app:destination="@+id/contentDocFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contentDocFragment"
+        android:name="ru.altrimo.slad2025.fragment.contentdoc.ContentDocFragment"
+        android:label="DocListFragment"
+        tools:layout="@layout/fragment_content_doc">
+        <argument
+            android:name="docGUID"
+            app:argType="string" />
+        <argument
+            android:name="docVersion"
+            app:argType="integer" />
+    </fragment>
+
 </navigation>

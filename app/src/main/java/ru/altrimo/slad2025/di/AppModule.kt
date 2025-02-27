@@ -10,8 +10,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ru.altrimo.slad2025.data.Preferences
 import ru.altrimo.slad2025.network.Api
-import ru.altrimo.slad2025.network.RemoteDataSource
+import ru.altrimo.slad2025.network.base.RemoteDataSource
+import ru.altrimo.slad2025.network.responce.LoginResponse
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -38,6 +40,13 @@ object AppModule {
     @Named("device")
     fun provideDevice(@ApplicationContext context: Context): String =
         Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+
+
+    @Singleton
+    @Provides
+    @Named("userGUID")
+    fun provideUserGUID(preferences: Preferences): String =
+        preferences.get<LoginResponse>(LoginResponse::class.java.name)?.userGUID ?: ""
 
 
 }

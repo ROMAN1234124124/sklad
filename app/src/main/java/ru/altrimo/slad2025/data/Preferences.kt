@@ -2,7 +2,10 @@ package ru.altrimo.slad2025.data
 
 import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
+import ru.altrimo.slad2025.BuildConfig
 import javax.inject.Inject
+
+const val API_SERVER = "API_SERVER"
 
 class Preferences @Inject constructor(val preferences: SharedPreferences) {
 
@@ -15,5 +18,10 @@ class Preferences @Inject constructor(val preferences: SharedPreferences) {
         val value = preferences.getString(key, null)
         return GsonBuilder().create().fromJson(value, T::class.java)
     }
+
+
+    var apiServer: String?
+        get() = preferences.getString(API_SERVER, BuildConfig.API_URL)
+        set(value) = preferences.edit().putString(API_SERVER, value).apply()
 
 }

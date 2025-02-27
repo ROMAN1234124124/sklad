@@ -1,4 +1,4 @@
-package ru.altrimo.slad2025.network
+package ru.altrimo.slad2025.network.base
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -8,9 +8,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.altrimo.slad2025.BuildConfig
+import ru.altrimo.slad2025.data.Preferences
 import javax.inject.Inject
 
-class RemoteDataSource @Inject constructor() {
+class RemoteDataSource @Inject constructor(private val preferences: Preferences) {
 
     fun <Api> buildApi(
         api: Class<Api>
@@ -23,7 +24,7 @@ class RemoteDataSource @Inject constructor() {
             .create(api)
     }
 
-    private fun baseUrl() = BuildConfig.API_URL
+    private fun baseUrl() = preferences.apiServer ?: BuildConfig.API_URL
 
     private fun gson(): Gson =
         GsonBuilder()
