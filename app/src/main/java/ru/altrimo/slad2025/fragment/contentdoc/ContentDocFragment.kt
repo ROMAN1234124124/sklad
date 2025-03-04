@@ -2,9 +2,11 @@ package ru.altrimo.slad2025.fragment.contentdoc
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,28 +31,38 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
     private lateinit var adapter: ContentDocAdapter
 
     override fun onInflationComplete() {
+        setupAdapter()
+        setupObserve()
+        refreshData()
         runScanner()
+        setupScannerResultListener()
+        setupBackPressedDispatcher()
         binding.actionCamera.setOnClickListener {
             viewModel.changeShowCamera()
         }
-        binding.recycler.layoutManager =
-            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        adapter = ContentDocAdapter {
-            showDialog(getString(R.string.del_barcode_confim_message)) {
-                viewModel.deleteBarcode(
-                    docVersion = args.docVersion,
-                    docGUID = args.docGUID,
-                    barcode = it
-                )
-            }
-        }
-        binding.recycler.adapter = adapter
-
         binding.refresher.setOnRefreshListener {
             refreshData()
         }
-        setupObserve()
-        refreshData()
+
+    }
+
+    private fun setupBackPressedDispatcher() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    showConfirmationDialog(getString(R.string.confirm_close_doc)) {
+                        viewModel.closeDoc(
+                            docVersion = args.docVersion,
+                            docGUID = args.docGUID
+                        )
+                    }
+                }
+            })
+    }
+
+
+    private fun setupScannerResultListener() {
         childFragmentManager.setFragmentResultListener(
             BarcodeScannerFragment.SCAN_REQUEST,
             viewLifecycleOwner
@@ -63,6 +75,32 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
                 )
             }
         }
+    }
+
+    private fun setupAdapter() {
+        adapter = ContentDocAdapter({
+            showConfirmationDialog(getString(R.string.del_barcode_confirm_message)) {
+                viewModel.deleteBarcode(
+                    docVersion = args.docVersion,
+                    docGUID = args.docGUID,
+                    barcode = it
+                )
+            }
+        }, {
+            showConfirmationDialog(getString(R.string.del_all_barcode_confirm_message)) {
+                viewModel.deleteBarcodeAll(
+                    docVersion = args.docVersion,
+                    docGUID = args.docGUID,
+                    rowGUID = it
+                )
+            }
+        }, {
+            viewModel.selectedProductGUID.value = it
+            refreshData()
+        })
+        binding.recycler.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        binding.recycler.adapter = adapter
     }
 
     private fun refreshData() {
@@ -115,6 +153,18 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
         }
         viewModel.searchBarcode.observe(viewLifecycleOwner) {
             refreshData()
+        }
+        viewModel.deleteBarcodeAll.observe(viewLifecycleOwner) {
+            refreshData()
+        }
+        viewModel.closeDoc.observe(viewLifecycleOwner) {
+            if (it.userMessage.isBlank()) {
+                findNavController().popBackStack()
+            } else {
+                showNextDialog(message = it.userMessage) {
+                    findNavController().popBackStack()
+                }
+            }
         }
     }
 

@@ -1,11 +1,13 @@
 package ru.altrimo.slad2025.data
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.gson.GsonBuilder
 import ru.altrimo.slad2025.BuildConfig
 import javax.inject.Inject
 
-const val API_SERVER = "API_SERVER"
+const val API_SERVER_PREF = "api_serv_pref"
 
 class Preferences @Inject constructor(val preferences: SharedPreferences) {
 
@@ -21,7 +23,10 @@ class Preferences @Inject constructor(val preferences: SharedPreferences) {
 
 
     var apiServer: String?
-        get() = preferences.getString(API_SERVER, BuildConfig.API_URL)
-        set(value) = preferences.edit().putString(API_SERVER, value).apply()
+        get() = preferences.getString(API_SERVER_PREF, BuildConfig.API_URL)
+        @SuppressLint("ApplySharedPref")
+        set(value) {
+            preferences.edit().putString(API_SERVER_PREF, value).commit()
+        }
 
 }

@@ -29,7 +29,6 @@ class DocListFragment : ViewBindingFragment<FragmentDocListBinding>() {
 
     private fun setupObserve() {
         viewModel.viewResult.observe(viewLifecycleOwner) {
-            binding.refresher.isRefreshing = false
             initAdapter(it)
         }
 
@@ -38,8 +37,28 @@ class DocListFragment : ViewBindingFragment<FragmentDocListBinding>() {
         }
 
         viewModel.viewShowLoading.observe(viewLifecycleOwner) {
+            binding.refresher.isRefreshing = it
             showProgress(it)
         }
+
+        viewModel.docOpen.observe(viewLifecycleOwner) {
+            if (it.userMessage.isBlank()) {
+                navigateToDocList(it.docGUID, it.docVersion)
+            } else {
+                showNextDialog(message = it.userMessage) {
+                    navigateToDocList(it.docGUID, it.docVersion)
+                }
+            }
+        }
+    }
+
+    private fun navigateToDocList(docGUID: String, docVersion: Int) {
+        findNavController().navigate(
+            DocListFragmentDirections.actionDocListToContentDoc(
+                docGUID = docGUID,
+                docVersion = docVersion
+            )
+        )
     }
 
 
@@ -58,12 +77,7 @@ class DocListFragment : ViewBindingFragment<FragmentDocListBinding>() {
                     return DocItemHolder(
                         binding
                     ) {
-                        findNavController().navigate(
-                            DocListFragmentDirections.actionDocListToContentDoc(
-                                docGUID = it.docGUID,
-                                docVersion = it.docVersion
-                            )
-                        )
+                        viewModel.openDoc(docGUID = it.docGUID, docVersion = it.docVersion)
                     }
                 }
             }

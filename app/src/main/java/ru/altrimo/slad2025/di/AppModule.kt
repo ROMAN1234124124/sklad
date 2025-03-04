@@ -2,14 +2,15 @@ package ru.altrimo.slad2025.di
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.provider.Settings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ru.altrimo.slad2025.BuildConfig
 import ru.altrimo.slad2025.data.Preferences
 import ru.altrimo.slad2025.network.Api
 import ru.altrimo.slad2025.network.base.RemoteDataSource
@@ -31,8 +32,9 @@ object AppModule {
     @Singleton
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+        return context.getSharedPreferences(BuildConfig.PREFERENCES_NAME, MODE_PRIVATE)
     }
+
 
     @SuppressLint("HardwareIds")
     @Singleton

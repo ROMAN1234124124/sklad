@@ -14,7 +14,12 @@
     <string name="cancel">НЕТ</string>
     <string name="lbl_search">Сервер:</string>
     <string name="title_setting">Настройки</string>
-    <string name="del_barcode_confim_message">Вы уверены что хотите удалить ШК?</string>
+    <string name="del_barcode_confirm_message">Вы уверены что хотите удалить ШК?</string>
+    <string name="del_all_barcode_confirm_message">Вы уверены что хотите удалить строку ШК?</string>
     <string name="actionSave">Сохранить</string>
     <string name="confirm_message_save_settings">Вы уверены что хотите сохранить настройки?</string>
+    <string name="action_del_all">удалить всю строку</string>
+    <string name="setting_error_url">Не валидный url</string>
+    <string name="confirm_close_doc">Вы уверены что хотите закрыть документ?</string>
+    <string name="alertNextDialogMessageTitle">Продолжить</string>
 </resources>

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.ItemContentBarcodeBinding
 import ru.altrimo.slad2025.databinding.ItemContentProductBinding
 import java.util.Locale
@@ -13,7 +14,9 @@ const val TYPE_PRODUCT = 0
 const val TYPE_BARCODE = 1
 
 class ContentDocAdapter(
-    private val actionDelBarcode: (guid: String) -> Unit
+    private val actionDelBarcode: (guid: String) -> Unit,
+    private val actionAllDelBarcode: (guid: String) -> Unit,
+    private val actionSelectProduct: (guid: String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<ListItem> = emptyList()
@@ -75,6 +78,11 @@ class ContentDocAdapter(
     inner class ProductViewHolder(private val binding: ItemContentProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(product: ListItem.ProductItem) {
+            if (product.rowContainer.isSelected) {
+                binding.cardView.setBackgroundResource(R.color.accent)
+            } else {
+                binding.cardView.setBackgroundResource(R.color.white)
+            }
             binding.product.text = product.rowContainer.product
             binding.count.text = String.format(
                 Locale.getDefault(),
@@ -82,6 +90,12 @@ class ContentDocAdapter(
                 product.rowContainer.quantityFact,
                 product.rowContainer.quantity
             )
+            binding.actionAllDelete.setOnClickListener {
+                actionAllDelBarcode.invoke(product.rowContainer.rowGUID)
+            }
+            binding.root.setOnClickListener {
+                actionSelectProduct.invoke(product.rowContainer.rowGUID)
+            }
         }
     }
 

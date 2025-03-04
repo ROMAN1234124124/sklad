@@ -73,18 +73,6 @@ abstract class ViewBindingFragment<VB : ViewBinding> : Fragment() {
         InflaterDelegate(VB::class)
 
 
-    fun showError(message: String) {
-        val builder = MaterialAlertDialogBuilder(requireActivity())
-        builder.setTitle(R.string.alertDialogErrorTitle)
-            .setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton(R.string.OK) { dialog, _ ->
-                dialog.cancel()
-            }
-        val alert = builder.create()
-        alert.show()
-    }
-
     fun showProgress(isVisible: Boolean) {
         (requireActivity() as MainActivity).showProgress(isVisible)
     }
@@ -95,17 +83,48 @@ abstract class ViewBindingFragment<VB : ViewBinding> : Fragment() {
         }
 
 
-    fun showDialog(sMessage: String, positiveAction: () -> Unit) {
+    fun showError(message: String) {
         val builder = MaterialAlertDialogBuilder(requireActivity())
-        builder.setTitle(R.string.alertDialogMessageTitle)
-            .setMessage(sMessage)
+        builder.setTitle(R.string.alertDialogErrorTitle)
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.OK) { dialog, _ ->
+                dialog.dismiss()
+            }
+        val alert = builder.create()
+        alert.show()
+    }
+
+    fun showConfirmationDialog(
+        message: String,
+        positiveAction: () -> Unit
+    ) {
+        val builder = MaterialAlertDialogBuilder(requireActivity())
+        builder.setTitle(getString(R.string.alertDialogMessageTitle))
+            .setMessage(message)
             .setCancelable(false)
             .setPositiveButton(R.string.OK) { dialog, _ ->
                 positiveAction()
                 dialog.cancel()
             }
             .setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.cancel()
+                dialog.dismiss()
+            }
+        val alert = builder.create()
+        alert.show()
+    }
+
+    fun showNextDialog(
+        message: String,
+        positiveAction: () -> Unit
+    ) {
+        val builder = MaterialAlertDialogBuilder(requireActivity())
+        builder.setTitle(getString(R.string.alertNextDialogMessageTitle))
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.OK) { dialog, _ ->
+                positiveAction()
+                dialog.dismiss()
             }
         val alert = builder.create()
         alert.show()

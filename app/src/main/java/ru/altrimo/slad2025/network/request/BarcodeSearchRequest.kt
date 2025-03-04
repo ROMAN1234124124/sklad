@@ -11,7 +11,9 @@ data class BarcodeSearchRequest(
     @SerializedName("doc_version")
     val docVersion: Int,
     @SerializedName("BarcodesList")
-    val barcodeList: List<Barcode>
+    val barcodeList: List<Barcode>,
+    @SerializedName("row_guid")
+    val rowGUID: String? = null
 )
 
 data class Barcode(

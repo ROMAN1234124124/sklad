@@ -8,6 +8,6 @@ const val RESULT_OK = "0"
 open class BaseViewModel : ViewModel() {
 
     val viewShowLoading = MutableLiveData<Boolean>()
-    val viewShowError = MutableLiveData<String>()
+    val viewShowError = SingleLiveEvent<String>()
 
 }

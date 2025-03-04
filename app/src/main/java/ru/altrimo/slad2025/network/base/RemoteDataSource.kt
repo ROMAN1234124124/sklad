@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.altrimo.slad2025.BuildConfig
 import ru.altrimo.slad2025.data.Preferences
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(private val preferences: Preferences) {
@@ -23,6 +24,7 @@ class RemoteDataSource @Inject constructor(private val preferences: Preferences)
             .build()
             .create(api)
     }
+
 
     private fun baseUrl() = preferences.apiServer ?: BuildConfig.API_URL
 
@@ -43,6 +45,8 @@ class RemoteDataSource @Inject constructor(private val preferences: Preferences)
                     )
                 }.build())
             }.also { client ->
+                client.connectTimeout(15, TimeUnit.SECONDS)
+                client.readTimeout(15, TimeUnit.SECONDS)
                 if (BuildConfig.DEBUG) {
                     val logging = HttpLoggingInterceptor()
                     logging.setLevel(HttpLoggingInterceptor.Level.BODY)

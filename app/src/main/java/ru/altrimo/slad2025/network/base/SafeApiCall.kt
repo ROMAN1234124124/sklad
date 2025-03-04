@@ -1,8 +1,12 @@
 package ru.altrimo.slad2025.network.base
 
+import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
+import okio.IOException
 import retrofit2.HttpException
+import java.net.SocketTimeoutException
 
 interface SafeApiCall {
 
@@ -18,7 +22,42 @@ interface SafeApiCall {
             } catch (throwable: Throwable) {
                 when (throwable) {
                     is HttpException -> {
-                        Resource.Failure(false, throwable.code(), throwable.response()?.errorBody())
+                        Resource.Failure(true, throwable.code(), throwable.response()?.errorBody())
+                    }
+
+                    is IllegalArgumentException -> {
+                        Resource.Failure(
+                            true,
+                            1,
+                            ResponseBody.create(
+                                null,
+                                throwable.message ?: "IllegalArgumentException"
+                            )
+                        )
+                    }
+
+                    is JsonSyntaxException -> {
+                        Resource.Failure(
+                            true,
+                            1,
+                            ResponseBody.create(null, throwable.message ?: "JsonSyntaxException")
+                        )
+                    }
+
+                    is SocketTimeoutException -> {
+                        Resource.Failure(
+                            true,
+                            1,
+                            ResponseBody.create(null, throwable.message ?: "SocketTimeoutException")
+                        )
+                    }
+
+                    is IOException -> {
+                        Resource.Failure(
+                            true,
+                            1,
+                            ResponseBody.create(null, throwable.message ?: "IOException")
+                        )
                     }
 
                     else -> {

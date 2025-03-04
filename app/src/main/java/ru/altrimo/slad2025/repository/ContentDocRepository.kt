@@ -2,9 +2,11 @@ package ru.altrimo.slad2025.repository
 
 import ru.altrimo.slad2025.network.Api
 import ru.altrimo.slad2025.network.request.Barcode
+import ru.altrimo.slad2025.network.request.BarcodeDeleteAllRequest
 import ru.altrimo.slad2025.network.request.BarcodeDeleteRequest
 import ru.altrimo.slad2025.network.request.BarcodeSearchRequest
 import ru.altrimo.slad2025.network.request.ContentDocRequest
+import ru.altrimo.slad2025.network.request.DocCloseRequest
 import ru.altrimo.slad2025.repository.base.Repository
 import javax.inject.Inject
 import javax.inject.Named
@@ -21,12 +23,18 @@ class ContentDocRepository @Inject constructor(
                 userGUID = userGUID,
                 device = device,
                 docGUID = docGUID,
-                docVersion = docVersion
-            )
+                docVersion = docVersion,
+
+                )
         )
     }.check()
 
-    suspend fun barcodeSearch(docGUID: String, docVersion: Int, barcodeList: List<Barcode>) =
+    suspend fun barcodeSearch(
+        docGUID: String,
+        docVersion: Int,
+        barcodeList: List<Barcode>,
+        rowGUID: String?
+    ) =
         safeApiCall {
             api.barcodeSearch(
                 BarcodeSearchRequest(
@@ -34,7 +42,8 @@ class ContentDocRepository @Inject constructor(
                     device = device,
                     docGUID = docGUID,
                     docVersion = docVersion,
-                    barcodeList = barcodeList
+                    barcodeList = barcodeList,
+                    rowGUID = rowGUID
                 )
             )
         }.check()
@@ -51,4 +60,27 @@ class ContentDocRepository @Inject constructor(
         )
     }.check()
 
+    suspend fun barcodeDeleteAll(docGUID: String, docVersion: Int, rowGUID: String) = safeApiCall {
+        api.barcodeDeleteAll(
+            BarcodeDeleteAllRequest(
+                userGUID = userGUID,
+                device = device,
+                docGUID = docGUID,
+                docVersion = docVersion,
+                rowGUID = rowGUID
+            )
+        )
+    }.check()
+
+
+    suspend fun closeDoc(docVersion: Int, docGUID: String) = safeApiCall {
+        api.closeDoc(
+            DocCloseRequest(
+                userGUID = userGUID,
+                device = device,
+                docVersion = docVersion,
+                docGUID = docGUID
+            )
+        )
+    }.check()
 }
