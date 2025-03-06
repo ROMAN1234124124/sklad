@@ -22,4 +22,9 @@
     <string name="setting_error_url">Не валидный url</string>
     <string name="confirm_close_doc">Вы уверены что хотите закрыть документ?</string>
     <string name="alertNextDialogMessageTitle">Продолжить</string>
+    <string name="actionExpandable">actionExpandable</string>
+    <string name="actionFlashlight">actionFlashlight</string>
+    <string name="zoomPlus">zoomPlus</string>
+    <string name="zoomMinus">zoomMinus</string>
+    <string name="zoom">zoom</string>
 </resources>

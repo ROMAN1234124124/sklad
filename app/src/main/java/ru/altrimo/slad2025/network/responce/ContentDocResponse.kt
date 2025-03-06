@@ -15,6 +15,7 @@ data class RowContainer(
     @SerializedName("row_guid")
     val rowGUID: String,
     var isSelected: Boolean = false,
+    var isExpandable: Boolean = false,
     @SerializedName("row_version")
     val rowVersion: Int,
     @SerializedName("row_number")

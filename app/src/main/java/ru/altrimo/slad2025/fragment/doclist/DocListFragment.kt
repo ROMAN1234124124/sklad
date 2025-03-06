@@ -38,7 +38,6 @@ class DocListFragment : ViewBindingFragment<FragmentDocListBinding>() {
 
         viewModel.viewShowLoading.observe(viewLifecycleOwner) {
             binding.refresher.isRefreshing = it
-            showProgress(it)
         }
 
         viewModel.docOpen.observe(viewLifecycleOwner) {

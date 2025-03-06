@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:layout_marginStart="40dp"
+    android:layout_marginStart="30dp"
     android:layout_marginEnd="10dp"
     android:layout_marginBottom="2dp"
     android:background="@drawable/bg_item_content_barcode"
@@ -13,20 +13,20 @@
 
     <TextView
         android:id="@+id/barcode"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/actionDelBarcode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Barcode 123124124" />
+        tools:text="Barcode 0104680001451320215W" />
 
     <TextView
         android:id="@+id/count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:text="12шт"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="12шт" />

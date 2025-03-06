@@ -7,17 +7,21 @@ import android.os.Bundle
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
+import android.widget.SeekBar
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.common.MlKitException
 import dagger.hilt.android.AndroidEntryPoint
+import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.FragmentBarcodeScannerBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.fragment.scanner.processor.BarcodeScannerProcessor
@@ -48,6 +52,41 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         )[BarcodeScannerViewModel::class.java].processCameraProvider.observe(this) { cameraProvider ->
             this.cameraProvider = cameraProvider
             bindAllCameraUseCases()
+            camera?.let { initializeFlashButton(it) }
+            binding.seekbarZoom.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?, progress: Int, fromUser: Boolean
+                ) {
+                    camera?.cameraControl?.setLinearZoom(progress / 100.toFloat())
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+    }
+
+
+    private fun initializeFlashButton(cam: Camera) = with(binding) {
+        if (cam.cameraInfo.hasFlashUnit()) {
+            actionFlashlight.setOnClickListener {
+                cam.cameraControl.enableTorch(
+                    cam.cameraInfo.torchState.value == TorchState.OFF
+                )
+            }
+            actionFlashlight.isVisible = true
+        } else {
+            actionFlashlight.isVisible = false
+        }
+
+        cam.cameraInfo.torchState.observe(viewLifecycleOwner) { torchState ->
+            if (torchState == TorchState.OFF) {
+                actionFlashlight.setImageResource(R.drawable.ic_flash_mode_off)
+            } else {
+                actionFlashlight.setImageResource(R.drawable.ic_flash_mode_on)
+            }
         }
     }
 

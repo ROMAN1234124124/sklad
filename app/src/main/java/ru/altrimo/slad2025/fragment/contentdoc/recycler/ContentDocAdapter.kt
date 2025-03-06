@@ -2,7 +2,8 @@ package ru.altrimo.slad2025.fragment.contentdoc.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.ItemContentBarcodeBinding
@@ -14,12 +15,8 @@ const val TYPE_PRODUCT = 0
 const val TYPE_BARCODE = 1
 
 class ContentDocAdapter(
-    private val actionDelBarcode: (guid: String) -> Unit,
-    private val actionAllDelBarcode: (guid: String) -> Unit,
-    private val actionSelectProduct: (guid: String) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var items: List<ListItem> = emptyList()
+    private val contentDocAdapterAction: ContentDocAdapterAction
+) : ListAdapter<ListItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == TYPE_PRODUCT) {
@@ -37,30 +34,18 @@ class ContentDocAdapter(
         }
     }
 
-
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (getItem(position)) {
             is ListItem.ProductItem -> TYPE_PRODUCT
             is ListItem.BarcodeItem -> TYPE_BARCODE
         }
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ProductViewHolder -> holder.bind(items[position] as ListItem.ProductItem)
-            is BarcodeViewHolder -> holder.bind(items[position] as ListItem.BarcodeItem)
+            is ProductViewHolder -> holder.bind(getItem(position) as ListItem.ProductItem)
+            is BarcodeViewHolder -> holder.bind(getItem(position) as ListItem.BarcodeItem)
         }
-    }
-
-    fun setItems(newItems: List<ListItem>) {
-        val diffCallback = DiffCallback(items, newItems)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        items = newItems
-        diffResult.dispatchUpdatesTo(this)
     }
 
     inner class BarcodeViewHolder(private val binding: ItemContentBarcodeBinding) :
@@ -70,7 +55,7 @@ class ContentDocAdapter(
             binding.count.text =
                 String.format(Locale.getDefault(), "%sшт", barcode.barcodeItem.quantity)
             binding.actionDelBarcode.setOnClickListener {
-                actionDelBarcode.invoke(barcode.barcodeItem.barcode)
+                contentDocAdapterAction.actionDelBarcode(barcode.barcodeItem.barcode)
             }
         }
     }
@@ -83,18 +68,22 @@ class ContentDocAdapter(
             } else {
                 binding.cardView.setBackgroundResource(R.color.white)
             }
+            binding.actionExpandable.isVisible = product.rowContainer.listBarcode.isNotEmpty()
             binding.product.text = product.rowContainer.product
             binding.count.text = String.format(
                 Locale.getDefault(),
-                "Факт: %sшт\nПлан: %sшт",
+                "Факт: %sшт    План: %sшт",
                 product.rowContainer.quantityFact,
                 product.rowContainer.quantity
             )
             binding.actionAllDelete.setOnClickListener {
-                actionAllDelBarcode.invoke(product.rowContainer.rowGUID)
+                contentDocAdapterAction.actionAllDelBarcode(product.rowContainer.rowGUID)
             }
             binding.root.setOnClickListener {
-                actionSelectProduct.invoke(product.rowContainer.rowGUID)
+                contentDocAdapterAction.actionSelectProduct(product.rowContainer.rowGUID)
+            }
+            binding.actionExpandable.setOnClickListener {
+                contentDocAdapterAction.actionExpandable(product.rowContainer.rowGUID)
             }
         }
     }

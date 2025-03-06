@@ -15,6 +15,7 @@ import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.FragmentContentDocBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.fragment.contentdoc.recycler.ContentDocAdapter
+import ru.altrimo.slad2025.fragment.contentdoc.recycler.ContentDocAdapterAction
 import ru.altrimo.slad2025.fragment.contentdoc.recycler.ListItem
 import ru.altrimo.slad2025.fragment.scanner.BarcodeScannerFragment
 import ru.altrimo.slad2025.network.request.Barcode
@@ -22,7 +23,8 @@ import ru.altrimo.slad2025.network.responce.RowContainer
 import ru.altrimo.slad2025.viewmodel.ContentDocViewModel
 
 @AndroidEntryPoint
-class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
+class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
+    ContentDocAdapterAction {
 
     override val inflaterDelegate by inflaterDelegate()
     private val viewModel: ContentDocViewModel by viewModels()
@@ -77,31 +79,14 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
         }
     }
 
+
     private fun setupAdapter() {
-        adapter = ContentDocAdapter({
-            showConfirmationDialog(getString(R.string.del_barcode_confirm_message)) {
-                viewModel.deleteBarcode(
-                    docVersion = args.docVersion,
-                    docGUID = args.docGUID,
-                    barcode = it
-                )
-            }
-        }, {
-            showConfirmationDialog(getString(R.string.del_all_barcode_confirm_message)) {
-                viewModel.deleteBarcodeAll(
-                    docVersion = args.docVersion,
-                    docGUID = args.docGUID,
-                    rowGUID = it
-                )
-            }
-        }, {
-            viewModel.selectedProductGUID.value = it
-            refreshData()
-        })
+        adapter = ContentDocAdapter(this)
         binding.recycler.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.recycler.adapter = adapter
     }
+
 
     private fun refreshData() {
         viewModel.contentDoc(
@@ -134,7 +119,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
 
     private fun setupObserve() {
         viewModel.viewResult.observe(viewLifecycleOwner) {
-            addItemsAdapter(it.listRowContainer)
+            refreshItemsAdapter(it.listRowContainer)
         }
 
         viewModel.viewShowError.observe(viewLifecycleOwner) {
@@ -143,7 +128,6 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
 
         viewModel.viewShowLoading.observe(viewLifecycleOwner) {
             binding.refresher.isRefreshing = it
-            showProgress(it)
         }
         viewModel.deleteBarcode.observe(viewLifecycleOwner) {
             refreshData()
@@ -168,17 +152,48 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>() {
         }
     }
 
-    private fun addItemsAdapter(item: List<RowContainer>) {
+    private fun refreshItemsAdapter(item: List<RowContainer>?, rowGUID: String? = null) {
         val items: MutableList<ListItem> = mutableListOf()
-        item.forEach { product ->
-            items.add(ListItem.ProductItem(product))
-            product.listBarcode.forEach { barcode ->
-                items.add(ListItem.BarcodeItem(barcode))
+        item?.forEach { product ->
+            val updateProduct =
+                rowGUID?.let { product.copy(isSelected = product.rowGUID == it) } ?: product
+            items.add(ListItem.ProductItem(updateProduct))
+            if (viewModel.expandableProduct[updateProduct.rowGUID] == false) {
+                updateProduct.listBarcode.forEach { barcode ->
+                    items.add(ListItem.BarcodeItem(barcode))
+                }
             }
         }
-        adapter.setItems(items)
+        adapter.submitList(items)
     }
 
+    override fun actionDelBarcode(barcode: String) {
+        showConfirmationDialog(getString(R.string.del_barcode_confirm_message)) {
+            viewModel.deleteBarcode(
+                docVersion = args.docVersion,
+                docGUID = args.docGUID,
+                barcode = barcode
+            )
+        }
+    }
+
+    override fun actionAllDelBarcode(guid: String) {
+        viewModel.deleteBarcodeAll(
+            docVersion = args.docVersion,
+            docGUID = args.docGUID,
+            rowGUID = guid
+        )
+    }
+
+    override fun actionSelectProduct(guid: String) {
+        viewModel.selectedProductGUID.value = guid
+        refreshItemsAdapter(viewModel.viewResult.value?.listRowContainer, guid)
+    }
+
+    override fun actionExpandable(guid: String) {
+        val isExpandable = viewModel.expandableProduct[guid] ?: true
+        viewModel.expandableProduct[guid] = !isExpandable
+        refreshItemsAdapter(viewModel.viewResult.value?.listRowContainer, guid)
+    }
 
 }
-

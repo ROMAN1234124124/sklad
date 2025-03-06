@@ -22,21 +22,31 @@
 
             <TextView
                 android:id="@+id/product"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/actionAllDelete"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Молоко 'Останкинское' 3.2%" />
+                tools:text="Вода мин. негаз 'Серебряная Усть - Быстра'" />
 
             <TextView
                 android:id="@+id/count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/product"
+                tools:text="Кол-во: 12шт" />
+
+            <ImageView
+                android:id="@+id/actionExpandable"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/actionExpandable"
+                android:scaleType="fitStart"
+                android:src="@android:drawable/arrow_down_float"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 tools:text="Кол-во: 12шт" />
 
             <ImageView

@@ -21,11 +21,13 @@ class ContentDocViewModel @Inject constructor(
 
     val viewResult = MutableLiveData<ContentDocResponse>()
     val isShowCamera = MutableLiveData<Boolean>()
-    val selectedProductGUID = MutableLiveData<String>()
     val closeDoc = SingleLiveEvent<DocCloseResponse>()
     val searchBarcode = SingleLiveEvent<Unit>()
     val deleteBarcode = SingleLiveEvent<Unit>()
     val deleteBarcodeAll = SingleLiveEvent<Unit>()
+
+    val selectedProductGUID = MutableLiveData<String>()
+    val expandableProduct = mutableMapOf<String, Boolean>()
 
     init {
         isShowCamera.postValue(true)
