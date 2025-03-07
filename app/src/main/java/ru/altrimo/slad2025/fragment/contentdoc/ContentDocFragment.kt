@@ -155,8 +155,11 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     private fun refreshItemsAdapter(item: List<RowContainer>?, rowGUID: String? = null) {
         val items: MutableList<ListItem> = mutableListOf()
         item?.forEach { product ->
-            val updateProduct =
-                rowGUID?.let { product.copy(isSelected = product.rowGUID == it) } ?: product
+            val updateProduct = if (rowGUID != null) {
+                product.copy(isSelected = product.rowGUID == rowGUID)
+            } else {
+                product.copy(isSelected = product.rowGUID == viewModel.selectedProductGUID.value)
+            }
             items.add(ListItem.ProductItem(updateProduct))
             if (viewModel.expandableProduct[updateProduct.rowGUID] == false) {
                 updateProduct.listBarcode.forEach { barcode ->
@@ -193,7 +196,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     override fun actionExpandable(guid: String) {
         val isExpandable = viewModel.expandableProduct[guid] ?: true
         viewModel.expandableProduct[guid] = !isExpandable
-        refreshItemsAdapter(viewModel.viewResult.value?.listRowContainer, guid)
+        refreshItemsAdapter(viewModel.viewResult.value?.listRowContainer)
     }
 
 }

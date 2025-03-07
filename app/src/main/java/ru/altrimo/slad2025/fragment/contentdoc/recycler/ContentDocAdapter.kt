@@ -41,12 +41,14 @@ class ContentDocAdapter(
         }
     }
 
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ProductViewHolder -> holder.bind(getItem(position) as ListItem.ProductItem)
+            is ProductViewHolder -> holder.bind(getItem(position)as ListItem.ProductItem)
             is BarcodeViewHolder -> holder.bind(getItem(position) as ListItem.BarcodeItem)
         }
     }
+
 
     inner class BarcodeViewHolder(private val binding: ItemContentBarcodeBinding) :
         RecyclerView.ViewHolder(binding.root) {

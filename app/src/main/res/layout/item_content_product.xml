@@ -28,7 +28,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/actionAllDelete"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Вода мин. негаз 'Серебряная Усть - Быстра'" />
+                tools:text="Вода мин. негаз 'Серебряная Усть - Быстра'"  />
 
             <TextView
                 android:id="@+id/count"
@@ -40,13 +40,12 @@
 
             <ImageView
                 android:id="@+id/actionExpandable"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/actionExpandable"
-                android:scaleType="fitStart"
-                android:src="@android:drawable/arrow_down_float"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@android:drawable/arrow_down_float"
                 tools:text="Кол-во: 12шт" />
 
             <ImageView
