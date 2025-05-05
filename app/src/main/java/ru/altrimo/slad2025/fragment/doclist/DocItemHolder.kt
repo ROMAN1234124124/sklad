@@ -12,14 +12,12 @@ class DocItemHolder(
 ) : SimpleListAdapter.ViewHolder<DocItem>(binding.root) {
 
     override fun bind(item: DocItem) {
-        binding.docNumberAndTypeDoc.text = String.format(
-            Locale.getDefault(), "%s %s", item.docType, item.docNumber
-        )
+        binding.txtDynamic.text = item.dynamicHtmlText
         binding.docStatusAndPercent.text = String.format(
-            Locale.getDefault(), "%s: %d%%", item.getDocStatus(item.docStatus), item.docPercent
+            Locale.getDefault(), "%s: %d%%", item.docStatus, item.docPercent
         )
+
         binding.docComment.text = item.docComment
-        binding.docDate.text = item.docDate
         binding.root.setOnClickListener {
             onClicked.invoke(item)
         }

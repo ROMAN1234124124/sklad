@@ -1,6 +1,7 @@
 package ru.altrimo.slad2025.fragment.contentdoc
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import ru.altrimo.slad2025.R
+import ru.altrimo.slad2025.common.BarcodeReceiver
+import ru.altrimo.slad2025.common.setHtmlText
 import ru.altrimo.slad2025.databinding.FragmentContentDocBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.fragment.contentdoc.recycler.ContentDocAdapter
@@ -31,13 +34,29 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     private val args: ContentDocFragmentArgs by navArgs()
     private val permissionLauncher = permissionLauncher(::checkPermissionCamera)
     private lateinit var adapter: ContentDocAdapter
+    private var isHandScanMode: Boolean? = null
+
+    private val barcodeReceiver = object : BarcodeReceiver() {
+        override fun onBarcodeReceive(
+            context: Context,
+            barcode: ru.altrimo.slad2025.common.Barcode
+        ) {
+            viewModel.searchBarcode(
+                docVersion = args.docVersion,
+                docGUID = args.docGUID,
+                barcodeList = listOf(barcode).map {
+                    Barcode(it.data)
+                }
+            )
+        }
+    }
 
     override fun onInflationComplete() {
         setupAdapter()
         setupObserve()
+        runCameraScanner()
         refreshData()
-        runScanner()
-        setupScannerResultListener()
+        setupCameraScannerResultListener()
         setupBackPressedDispatcher()
         binding.actionCamera.setOnClickListener {
             viewModel.changeShowCamera()
@@ -45,7 +64,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
         binding.refresher.setOnRefreshListener {
             refreshData()
         }
-
+        lifecycle.addObserver(barcodeReceiver.registerLifecycleEventObserver(requireContext()))
     }
 
     private fun setupBackPressedDispatcher() {
@@ -64,7 +83,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     }
 
 
-    private fun setupScannerResultListener() {
+    private fun setupCameraScannerResultListener() {
         childFragmentManager.setFragmentResultListener(
             BarcodeScannerFragment.SCAN_REQUEST,
             viewLifecycleOwner
@@ -96,13 +115,16 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     }
 
 
-    private fun runScanner() {
+    private fun runCameraScanner() {
         if (requireActivity().applicationContext.checkSelfPermission(Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
         ) {
             childFragmentManager.commit {
                 setReorderingAllowed(true)
-                add(R.id.child_fragment_container, BarcodeScannerFragment())
+                replace(
+                    R.id.child_fragment_container,
+                    BarcodeScannerFragment.newInstance(isHandScanMode ?: true)
+                )
             }
         } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -111,7 +133,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
 
     private fun checkPermissionCamera(isGranted: Boolean) {
         if (isGranted) {
-            runScanner()
+            runCameraScanner()
         } else {
             showError(getString(R.string.error_camera_permission))
         }
@@ -120,6 +142,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     private fun setupObserve() {
         viewModel.viewResult.observe(viewLifecycleOwner) {
             refreshItemsAdapter(it.listRowContainer)
+            binding.dynamicText.setHtmlText(it.dynamicHtmlText)
         }
 
         viewModel.viewShowError.observe(viewLifecycleOwner) {
@@ -181,11 +204,13 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     }
 
     override fun actionAllDelBarcode(guid: String) {
-        viewModel.deleteBarcodeAll(
-            docVersion = args.docVersion,
-            docGUID = args.docGUID,
-            rowGUID = guid
-        )
+        showConfirmationDialog(getString(R.string.del_all_barcode_confirm_message)) {
+            viewModel.deleteBarcodeAll(
+                docVersion = args.docVersion,
+                docGUID = args.docGUID,
+                rowGUID = guid
+            )
+        }
     }
 
     override fun actionSelectProduct(guid: String) {

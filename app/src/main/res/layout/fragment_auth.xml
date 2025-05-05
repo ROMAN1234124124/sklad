@@ -49,8 +49,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/login"
                     android:imeOptions="actionNext"
-                    android:inputType="text"
-                    android:text="Афонин Г.А." />
+                    android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,16 +68,41 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
-                    android:inputType="textPassword"
-                    android:text="111" />
+                    android:inputType="textPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <CheckBox
+                    android:id="@+id/rememberMe"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/checkbox_auto_login"
+                    android:button="@null"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/rememberMe"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/rememberMe"
+                    app:layout_constraintStart_toEndOf="@+id/rememberMe" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <Button
                 android:id="@+id/actionLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/action_login" />
 
         </LinearLayout>

@@ -5,6 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class ContentDocResponse(
     @SerializedName("doc_modeFilling")
     val docModeFilling: Int,
+    @SerializedName("dynamic_html_text")
+    val dynamicHtmlText: String,
+    @SerializedName("doc_scanbutton")
+    val isHandScanMode: Boolean = true,
     @SerializedName("rows_content")
     val listRowContainer: List<RowContainer>,
     val result: String,

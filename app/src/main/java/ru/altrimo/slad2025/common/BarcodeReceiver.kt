@@ -1,4 +1,4 @@
-package ru.altrimo.slad2025.atol
+package ru.altrimo.slad2025.common
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -32,8 +32,8 @@ abstract class BarcodeReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(context: Context, intent: Intent) {
-        when {
-            intent.action == SCAN_DECODING_BROADCAST -> if (intent.hasExtra(SCAN_DECODING_DATA)) {
+        when (intent.action) {
+            SCAN_DECODING_BROADCAST -> if (intent.hasExtra(SCAN_DECODING_DATA)) {
                 val type = if (intent.hasExtra(SCAN_SYMBOLOGY_TYPE))
                     intent.getStringExtra(SCAN_SYMBOLOGY_TYPE)
                 else
@@ -44,7 +44,6 @@ abstract class BarcodeReceiver : BroadcastReceiver() {
                 )
                 onBarcodeReceive(context, barcode)
             }
-
         }
     }
 

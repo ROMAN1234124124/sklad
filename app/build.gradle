@@ -28,7 +28,7 @@ android {
     buildTypes {
         debug {
             debuggable true
-            buildConfigField 'String', 'API_URL', '"http://45.10.111.32:8080/fevral_ut11/hs/tsd/"'
+            buildConfigField 'String', 'API_URL', '"http://45.10.111.32:8080/fevral_test/hs/tsd/"'
             buildConfigField 'String', 'API_USER', '"ws"'
             buildConfigField 'String', 'API_PASSWORD', '"123"'
             buildConfigField 'String', 'PREFERENCES_NAME ', '"AltrimoPreferences "'

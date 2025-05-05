@@ -11,7 +11,7 @@ class DiffCallback : DiffUtil.ItemCallback<ListItem>() {
             }
 
             oldItem is ListItem.BarcodeItem && newItem is ListItem.BarcodeItem -> {
-                oldItem.barcodeItem.rowGuid == newItem.barcodeItem.rowGuid
+                oldItem.barcodeItem.barcode == newItem.barcodeItem.barcode
             }
 
             else -> true

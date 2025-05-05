@@ -1,11 +1,11 @@
 package ru.altrimo.slad2025.viewmodel
 
-import android.bluetooth.BluetoothClass.Device
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.altrimo.slad2025.data.local.Credential
 import ru.altrimo.slad2025.network.request.LoginRequest
 import ru.altrimo.slad2025.repository.AuthRepository
 import ru.altrimo.slad2025.viewmodel.base.BaseViewModel
@@ -20,6 +20,13 @@ class AuthViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     val viewResult = MutableLiveData<Unit>()
+    val credential = MutableLiveData<Credential>()
+
+    init {
+        authRepository.getCredential()?.let {
+            credential.postValue(it)
+        }
+    }
 
     fun auth(login: String, password: String) {
         viewModelScope.launch(Dispatchers.Default) {
@@ -37,6 +44,7 @@ class AuthViewModel @Inject constructor(
                 if (it.result == RESULT_OK) {
                     authRepository.putAuth(it)
                     viewResult.postValue(Unit)
+                    authRepository.saveCredential(Credential(userName = login, password = password))
                 } else {
                     viewShowError.postValue(it.error.userMessage)
                 }
@@ -46,6 +54,10 @@ class AuthViewModel @Inject constructor(
             }
 
         }
+    }
+
+    fun rememberCredential(isRemember: Boolean) {
+        authRepository.rememberCredential(isRemember)
     }
 
 

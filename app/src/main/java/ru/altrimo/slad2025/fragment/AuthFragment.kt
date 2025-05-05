@@ -4,6 +4,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.altrimo.slad2025.R
+import ru.altrimo.slad2025.common.toEditable
 import ru.altrimo.slad2025.databinding.FragmentAuthBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.viewmodel.AuthViewModel
@@ -28,6 +29,10 @@ class AuthFragment : ViewBindingFragment<FragmentAuthBinding>() {
         binding.actionSettings.setOnClickListener {
             findNavController().navigate(R.id.action_auth_to_setting)
         }
+        binding.rememberMe.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.rememberCredential(isChecked)
+        }
+
     }
 
     private fun setupObserve() {
@@ -37,6 +42,12 @@ class AuthFragment : ViewBindingFragment<FragmentAuthBinding>() {
 
         viewModel.viewShowError.observe(viewLifecycleOwner) {
             showError(it)
+        }
+
+        viewModel.credential.observe(viewLifecycleOwner) {
+            binding.txtLogin.text = it.userName.toEditable()
+            binding.txtPassword.text = it.password.toEditable()
+            binding.rememberMe.isChecked = true
         }
 
         viewModel.viewShowLoading.observe(viewLifecycleOwner) {

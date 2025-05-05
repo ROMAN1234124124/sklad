@@ -3,14 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="4dp"
         app:cardCornerRadius="8dp">
 
@@ -20,34 +23,26 @@
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/docNumberAndTypeDoc"
-                android:layout_width="wrap_content"
+                android:id="@+id/txtDynamic"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:layout_marginStart="5dp"
+                app:layout_constraintEnd_toStartOf="@+id/docStatusAndPercent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="РТУ 000000003" />
+                tools:text="РТУ asdasdasdasdasdasdaasdasdasasdsdasdasd" />
 
-            <TextView
-                android:id="@+id/docDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                app:drawableStartCompat="@drawable/ic_timer"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/docNumberAndTypeDoc"
-                tools:text="2025-02-02T22:48:49" />
 
             <TextView
                 android:id="@+id/docComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:layout_marginStart="5dp"
                 android:drawablePadding="4dp"
                 app:drawableStartCompat="@drawable/ic_comment"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/docDate"
+                app:layout_constraintTop_toBottomOf="@+id/txtDynamic"
                 tools:text="Для обработки на ТСД " />
 
             <TextView

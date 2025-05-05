@@ -74,9 +74,9 @@ class ContentDocAdapter(
             binding.product.text = product.rowContainer.product
             binding.count.text = String.format(
                 Locale.getDefault(),
-                "Факт: %sшт    План: %sшт",
-                product.rowContainer.quantityFact,
-                product.rowContainer.quantity
+                "План: %sшт  Факт: %sшт",
+                product.rowContainer.quantity,
+                product.rowContainer.quantityFact
             )
             binding.actionAllDelete.setOnClickListener {
                 contentDocAdapterAction.actionAllDelBarcode(product.rowContainer.rowGUID)

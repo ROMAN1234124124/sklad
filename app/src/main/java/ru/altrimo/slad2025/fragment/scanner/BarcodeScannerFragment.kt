@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
@@ -18,7 +20,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.google.mlkit.common.MlKitException
 import dagger.hilt.android.AndroidEntryPoint
 import ru.altrimo.slad2025.R
@@ -26,7 +28,7 @@ import ru.altrimo.slad2025.databinding.FragmentBarcodeScannerBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.fragment.scanner.processor.BarcodeScannerProcessor
 import ru.altrimo.slad2025.fragment.scanner.processor.VisionImageProcessor
-import java.util.ArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 
 @AndroidEntryPoint
 class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding>(),
@@ -39,17 +41,17 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
     private var analysisUseCase: ImageAnalysis? = null
     private var imageProcessor: VisionImageProcessor? = null
     private var camera: Camera? = null
-
+    private val viewModel: BarcodeScannerViewModel by viewModels()
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private val defaultResolution: Size = Size(1080, 1920)
+    private var isHandScanMode: Boolean? = null
+    private val isKeyDown = AtomicBoolean(false)
 
 
     override fun onInflationComplete() {
         previewView = binding.previewView
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[BarcodeScannerViewModel::class.java].processCameraProvider.observe(this) { cameraProvider ->
+        isHandScanMode = arguments?.getBoolean(IS_HAND_SCAN_MODE)
+        viewModel.processCameraProvider.observe(this) { cameraProvider ->
             this.cameraProvider = cameraProvider
             bindAllCameraUseCases()
             camera?.let { initializeFlashButton(it) }
@@ -65,6 +67,46 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
+        }
+
+        binding.imgQrBox.isVisible = isHandScanMode == false
+
+        binding.root.isFocusableInTouchMode = true
+        binding.root.requestFocus()
+        binding.root.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    binding.imgQrBox.isVisible = true
+                    if (event.repeatCount == 0) {
+                        isKeyDown.set(true)
+                    }
+                } else {
+                    isKeyDown.set(false)
+                    binding.imgQrBox.isVisible = false
+                }
+            }
+            true
+        }
+    }
+
+    override fun onBarcodes(results: List<String>) {
+        if (results.isNotEmpty()) {
+            if (isHandScanMode == true) {
+                if (isKeyDown.get()) {
+                    beep()
+                    val result = Bundle().apply {
+                        putStringArrayList(SCAN_RESULT, ArrayList(results))
+                    }
+                    parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
+                    isKeyDown.set(false)
+                }
+            } else {
+                beep()
+                val result = Bundle().apply {
+                    putStringArrayList(SCAN_RESULT, ArrayList(results))
+                }
+                parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
+            }
         }
     }
 
@@ -90,44 +132,37 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         }
     }
 
-    override fun onBarcodes(results: List<String>) {
-        if (results.isNotEmpty()) {
-            beep()
-            val result = Bundle().apply {
-                putStringArrayList(SCAN_RESULT, ArrayList(results))
-            }
-            parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
-        }
-    }
-
 
     private fun bindAllCameraUseCases() {
         if (cameraProvider != null) {
-            cameraProvider!!.unbindAll()
+            cameraProvider?.unbindAll()
             bindPreviewUseCase()
-            bindAnalysisUseCase()
             bindActions()
+            bindAnalysisUseCase()
         }
     }
 
     private fun bindPreviewUseCase() {
-        if (cameraProvider == null) {
-            return
-        }
-        if (previewUseCase != null) {
-            cameraProvider?.unbind(previewUseCase)
-        }
-        cameraProvider?.unbind(previewUseCase)
+        if (cameraProvider == null || previewView == null) return
+        binding.loadingContainer.isVisible = true
+        previewUseCase?.let { cameraProvider?.unbind(it) }
         val builder = Preview.Builder()
         @Suppress("DEPRECATION")
         builder.setTargetResolution(defaultResolution)
         previewUseCase = builder.build()
         previewUseCase?.surfaceProvider = previewView?.surfaceProvider
-        camera = cameraProvider?.bindToLifecycle(
-            this,
-            cameraSelector,
-            previewUseCase
-        )
+        try {
+            camera = cameraProvider?.bindToLifecycle(
+                this,
+                cameraSelector,
+                previewUseCase
+            )
+            binding.loadingContainer.isVisible = false
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            binding.loadingContainer.isVisible = false
+        }
     }
 
     private fun bindAnalysisUseCase() {
@@ -204,6 +239,17 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
     companion object {
         const val SCAN_RESULT = "scan_result"
         const val SCAN_REQUEST = "scan_request"
+        const val IS_HAND_SCAN_MODE = "isHandScanMode"
+
+        fun newInstance(isHandScanMode: Boolean): BarcodeScannerFragment {
+            val fragment = BarcodeScannerFragment()
+            val args = Bundle().apply {
+                putBoolean(IS_HAND_SCAN_MODE, isHandScanMode)
+            }
+            fragment.arguments = args
+            return fragment
+        }
+
     }
 
 }

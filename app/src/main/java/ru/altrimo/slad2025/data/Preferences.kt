@@ -2,14 +2,17 @@ package ru.altrimo.slad2025.data
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.gson.GsonBuilder
 import ru.altrimo.slad2025.BuildConfig
 import javax.inject.Inject
 
-const val API_SERVER_PREF = "api_serv_pref"
 
 class Preferences @Inject constructor(val preferences: SharedPreferences) {
+
+    private companion object {
+        const val API_SERVER_PREF = "api_serv_pref"
+        const val REMEMBER_CREDENTIAL_PREF = "remember_credential_pref"
+    }
 
     fun <T> put(`object`: T, key: String) {
         val jsonString = GsonBuilder().create().toJson(`object`)
@@ -27,6 +30,12 @@ class Preferences @Inject constructor(val preferences: SharedPreferences) {
         @SuppressLint("ApplySharedPref")
         set(value) {
             preferences.edit().putString(API_SERVER_PREF, value).commit()
+        }
+
+    var isRememberCredential: Boolean
+        get() = preferences.getBoolean(REMEMBER_CREDENTIAL_PREF, false)
+        set(value) {
+            preferences.edit().putBoolean(REMEMBER_CREDENTIAL_PREF, value).apply()
         }
 
 }

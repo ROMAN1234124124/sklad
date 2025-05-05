@@ -27,4 +27,10 @@
     <string name="zoomPlus">zoomPlus</string>
     <string name="zoomMinus">zoomMinus</string>
     <string name="zoom">zoom</string>
+    <string name="rememberMe">Запомнить меня</string>
+    <string name="empty_data">Нет данных</string>
+    <string name="title_doc_list">Документы</string>
+    <string name="title_doc_content">Обработка документа</string>
+    <string name="loading_camera">Загрузка камеры...</string>
+    <string name="close_app">Вы уверены что хотите выйти из приложения?</string>
 </resources>

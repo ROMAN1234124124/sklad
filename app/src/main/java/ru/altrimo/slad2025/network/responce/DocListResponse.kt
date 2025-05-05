@@ -27,16 +27,7 @@ data class DocItem(
     @SerializedName("doc_status")
     val docStatus: String,
     @SerializedName("doc_procent")
-    val docPercent: Int
-) {
-
-    fun getDocStatus(docType: String): String {
-        return when (docType) {
-            "1" -> "Новый"
-            "2" -> "В работе"
-            "3" -> "Обработан"
-            else -> "error doc_status"
-        }
-    }
-
-}
+    val docPercent: Int,
+    @SerializedName("dynamic_html_text")
+    val dynamicHtmlText: String
+)
