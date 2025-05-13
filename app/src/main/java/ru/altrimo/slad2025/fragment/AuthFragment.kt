@@ -3,6 +3,7 @@ package ru.altrimo.slad2025.fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import ru.altrimo.slad2025.BuildConfig
 import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.common.toEditable
 import ru.altrimo.slad2025.databinding.FragmentAuthBinding
@@ -32,7 +33,7 @@ class AuthFragment : ViewBindingFragment<FragmentAuthBinding>() {
         binding.rememberMe.setOnCheckedChangeListener { _, isChecked ->
             viewModel.rememberCredential(isChecked)
         }
-
+        binding.versionApp.text = getString(R.string.version_app, BuildConfig.VERSION_NAME)
     }
 
     private fun setupObserve() {

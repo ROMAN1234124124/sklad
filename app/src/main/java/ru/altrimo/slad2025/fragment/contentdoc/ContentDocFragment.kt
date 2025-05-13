@@ -146,6 +146,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
         }
 
         viewModel.viewShowError.observe(viewLifecycleOwner) {
+            playSoundError()
             showError(it)
         }
 

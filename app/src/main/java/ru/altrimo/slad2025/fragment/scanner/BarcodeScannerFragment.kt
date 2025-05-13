@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
-import android.util.Log
 import android.util.Size
-import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
@@ -70,24 +68,19 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         }
 
         binding.imgQrBox.isVisible = isHandScanMode == false
-
-        binding.root.isFocusableInTouchMode = true
-        binding.root.requestFocus()
-        binding.root.setOnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    binding.imgQrBox.isVisible = true
-                    if (event.repeatCount == 0) {
-                        isKeyDown.set(true)
-                    }
-                } else {
-                    isKeyDown.set(false)
-                    binding.imgQrBox.isVisible = false
-                }
-            }
-            true
-        }
     }
+
+
+    fun keyDownVolume() {
+        binding.imgQrBox.isVisible = true
+        isKeyDown.set(true)
+    }
+
+    fun keyUpVolume() {
+        isKeyDown.set(false)
+        binding.imgQrBox.isVisible = false
+    }
+
 
     override fun onBarcodes(results: List<String>) {
         if (results.isNotEmpty()) {
@@ -234,7 +227,6 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         super.onDestroy()
         imageProcessor?.run { this.stop() }
     }
-
 
     companion object {
         const val SCAN_RESULT = "scan_result"

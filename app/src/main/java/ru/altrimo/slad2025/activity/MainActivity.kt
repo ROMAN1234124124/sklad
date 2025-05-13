@@ -9,7 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.ActivityMainBinding
-import ru.altrimo.slad2025.fragment.base.BaseFragment
+import ru.altrimo.slad2025.fragment.scanner.BarcodeScannerFragment
 
 
 @AndroidEntryPoint
@@ -37,13 +37,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        val currentFragment = mNavController.currentDestination?.id?.let {
-            supportFragmentManager.findFragmentById(it)
-        }
-        if (currentFragment is BaseFragment && currentFragment.isVisible){
-            currentFragment.handleKeyDown(keyCode)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
+        val parentFragment = navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
+        val currentFragment =
+            parentFragment?.childFragmentManager?.findFragmentById(R.id.child_fragment_container)
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (currentFragment is BarcodeScannerFragment) {
+                if (event?.repeatCount == 0) {
+                    currentFragment.keyDownVolume()
+                }
+                return true
+            }
         }
         return super.onKeyDown(keyCode, event)
     }
+
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
+        val parentFragment = navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
+        val currentFragment =
+            parentFragment?.childFragmentManager?.findFragmentById(R.id.child_fragment_container)
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (currentFragment is BarcodeScannerFragment) {
+                currentFragment.keyUpVolume()
+                return true
+            }
+        }
+        return super.onKeyUp(keyCode, event)
+    }
+
 
 }

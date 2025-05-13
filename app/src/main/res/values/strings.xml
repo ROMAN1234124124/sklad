@@ -33,4 +33,5 @@
     <string name="title_doc_content">Обработка документа</string>
     <string name="loading_camera">Загрузка камеры...</string>
     <string name="close_app">Вы уверены что хотите выйти из приложения?</string>
+    <string name="version_app">Версия: %s</string>
 </resources>

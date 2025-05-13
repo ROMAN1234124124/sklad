@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.altrimo.slad2025.R
@@ -22,7 +23,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.functions
 
 
-abstract class ViewBindingFragment<VB : ViewBinding> : BaseFragment() {
+abstract class ViewBindingFragment<VB : ViewBinding> : Fragment() {
 
 
     private var _binding: ViewBinding? = null
