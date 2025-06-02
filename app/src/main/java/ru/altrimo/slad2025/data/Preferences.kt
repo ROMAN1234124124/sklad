@@ -11,6 +11,7 @@ class Preferences @Inject constructor(val preferences: SharedPreferences) {
 
     private companion object {
         const val API_SERVER_PREF = "api_serv_pref"
+        const val IS_COMPUTER_VISION = "is_computer_vision"
         const val REMEMBER_CREDENTIAL_PREF = "remember_credential_pref"
     }
 
@@ -36,6 +37,12 @@ class Preferences @Inject constructor(val preferences: SharedPreferences) {
         get() = preferences.getBoolean(REMEMBER_CREDENTIAL_PREF, false)
         set(value) {
             preferences.edit().putBoolean(REMEMBER_CREDENTIAL_PREF, value).apply()
+        }
+
+    var isComputerVision: Boolean
+        get() = preferences.getBoolean(IS_COMPUTER_VISION, false)
+        set(value) {
+            preferences.edit().putBoolean(IS_COMPUTER_VISION, value).apply()
         }
 
 }

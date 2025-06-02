@@ -52,22 +52,4 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
-
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
-        val parentFragment = navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
-        val currentFragment =
-            parentFragment?.childFragmentManager?.findFragmentById(R.id.child_fragment_container)
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            if (currentFragment is BarcodeScannerFragment) {
-                currentFragment.keyUpVolume()
-                return true
-            }
-        }
-        return super.onKeyUp(keyCode, event)
-    }
-
-
 }

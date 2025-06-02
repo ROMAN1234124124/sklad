@@ -15,13 +15,13 @@ class BarcodeScannerProcessor(
 ) : VisionProcessorBase<List<Barcode>>(context) {
 
     private val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
-    private var job: Deferred<Unit>
+    private var job: Job
     private val processSet = mutableSetOf<String>()
 
 
     private fun CoroutineScope.launchPeriodicAsync(
         repeatMillis: Long,
-        action: () -> Unit
+        action: suspend () -> Unit
     ) = this.async {
         if (repeatMillis > 0) {
             while (isActive) {
@@ -32,15 +32,18 @@ class BarcodeScannerProcessor(
             action()
         }
     }
-
     /**
      * Возвращает очень много результатов меньше чем за секунду,
      * кешируем уникальные значения, накопившиеся за секунду.
      */
     init {
-        job = CoroutineScope(Dispatchers.IO).launchPeriodicAsync(1000) {
+        job = CoroutineScope(Dispatchers.Default).launchPeriodicAsync(1000) {
+            Log.d(TAG,"processSet1 $processSet")
             if (processSet.isNotEmpty()) {
-                barcodeScannerListener.onBarcodes(processSet.toList())
+                Log.d(TAG,"processSet12 $processSet")
+                withContext(Dispatchers.Main) {
+                    barcodeScannerListener.onBarcodes(processSet.toList())
+                }
                 processSet.clear()
             }
         }
@@ -58,12 +61,14 @@ class BarcodeScannerProcessor(
         return barcodeScanner.process(image)
     }
 
-    override fun onSuccess(results: List<Barcode>) {
+    override fun onSuccess(results: List<Barcode>, graphicOverlay: GraphicOverlay) {
         Log.d(TAG, results.toString())
         if (results.isNotEmpty()) {
             for (barcode in results) {
                 barcode.displayValue?.let {
+                    Log.d(TAG, results.toString())
                     processSet.add(it)
+                    graphicOverlay.add(BarcodeGraphic(graphicOverlay, barcode))
                 }
             }
         }

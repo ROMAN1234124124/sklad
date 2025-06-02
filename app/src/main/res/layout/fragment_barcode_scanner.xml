@@ -10,6 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ru.altrimo.slad2025.fragment.scanner.processor.GraphicOverlay
+        android:id="@+id/graphic_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/previewView"
+        app:layout_constraintLeft_toLeftOf="@id/previewView"
+        app:layout_constraintRight_toRightOf="@id/previewView"
+        app:layout_constraintTop_toTopOf="@id/previewView" />
+
     <LinearLayout
         android:id="@+id/loadingContainer"
         android:layout_width="wrap_content"
@@ -48,7 +57,7 @@
         android:elevation="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.75"
+        app:layout_constraintHeight_percent="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.75" />
@@ -63,11 +72,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/actionVision"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:contentDescription="@string/actionFlashlight"
+        android:src="@drawable/ic_computer_vision_off"
+        app:layout_constraintEnd_toStartOf="@+id/actionFlashlight"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        app:layout_constraintEnd_toStartOf="@+id/actionFlashlight"
+        android:layout_marginStart="30dp"
+        app:layout_constraintEnd_toStartOf="@+id/actionVision"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

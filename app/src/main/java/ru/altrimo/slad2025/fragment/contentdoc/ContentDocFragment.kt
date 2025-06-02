@@ -34,7 +34,6 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
     private val args: ContentDocFragmentArgs by navArgs()
     private val permissionLauncher = permissionLauncher(::checkPermissionCamera)
     private lateinit var adapter: ContentDocAdapter
-    private var isHandScanMode: Boolean? = null
 
     private val barcodeReceiver = object : BarcodeReceiver() {
         override fun onBarcodeReceive(
@@ -121,10 +120,7 @@ class ContentDocFragment : ViewBindingFragment<FragmentContentDocBinding>(),
         ) {
             childFragmentManager.commit {
                 setReorderingAllowed(true)
-                replace(
-                    R.id.child_fragment_container,
-                    BarcodeScannerFragment.newInstance(isHandScanMode ?: true)
-                )
+                replace(R.id.child_fragment_container, BarcodeScannerFragment())
             }
         } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)

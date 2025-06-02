@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
@@ -25,6 +26,7 @@ import ru.altrimo.slad2025.R
 import ru.altrimo.slad2025.databinding.FragmentBarcodeScannerBinding
 import ru.altrimo.slad2025.fragment.base.ViewBindingFragment
 import ru.altrimo.slad2025.fragment.scanner.processor.BarcodeScannerProcessor
+import ru.altrimo.slad2025.fragment.scanner.processor.GraphicOverlay
 import ru.altrimo.slad2025.fragment.scanner.processor.VisionImageProcessor
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,13 +44,12 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
     private val viewModel: BarcodeScannerViewModel by viewModels()
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private val defaultResolution: Size = Size(1080, 1920)
-    private var isHandScanMode: Boolean? = null
-    private val isKeyDown = AtomicBoolean(false)
-
+    private val isComputerVision = AtomicBoolean(false)
+    private lateinit var graphicOverlay: GraphicOverlay
 
     override fun onInflationComplete() {
         previewView = binding.previewView
-        isHandScanMode = arguments?.getBoolean(IS_HAND_SCAN_MODE)
+        graphicOverlay = binding.graphicOverlay
         viewModel.processCameraProvider.observe(this) { cameraProvider ->
             this.cameraProvider = cameraProvider
             bindAllCameraUseCases()
@@ -67,39 +68,44 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
             })
         }
 
-        binding.imgQrBox.isVisible = isHandScanMode == false
+        viewModel.isComputerVision.observe(viewLifecycleOwner) { isComputerVision ->
+            binding.imgQrBox.isVisible = isComputerVision == true
+            this.isComputerVision.set(isComputerVision)
+            binding.actionVision.setImageResource(
+                if (isComputerVision) R.drawable.ic_computer_vision_on else R.drawable.ic_computer_vision_off
+            )
+        }
+
+        binding.actionVision.setOnClickListener {
+            viewModel.changeStateComputerVision(isComputerVision.get())
+        }
     }
 
 
     fun keyDownVolume() {
-        binding.imgQrBox.isVisible = true
-        isKeyDown.set(true)
-    }
-
-    fun keyUpVolume() {
-        isKeyDown.set(false)
-        binding.imgQrBox.isVisible = false
+        if (!isComputerVision.get()) {
+            binding.imgQrBox.isVisible = true
+        }
     }
 
 
     override fun onBarcodes(results: List<String>) {
-        if (results.isNotEmpty()) {
-            if (isHandScanMode == true) {
-                if (isKeyDown.get()) {
-                    beep()
-                    val result = Bundle().apply {
-                        putStringArrayList(SCAN_RESULT, ArrayList(results))
-                    }
-                    parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
-                    isKeyDown.set(false)
-                }
-            } else {
-                beep()
-                val result = Bundle().apply {
-                    putStringArrayList(SCAN_RESULT, ArrayList(results))
-                }
-                parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
+        Log.d("Scanner", "onBarcodes called with results: $results, isComputerVision=${isComputerVision.get()}, imgQrBox=${binding.imgQrBox.isVisible}")
+        if (results.isEmpty()) return
+        if (isComputerVision.get()) {
+            beep()
+            val result = Bundle().apply {
+                putStringArrayList(SCAN_RESULT, ArrayList(results))
             }
+            parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
+
+        } else if (binding.imgQrBox.isVisible) {
+            beep()
+            binding.imgQrBox.isVisible = false
+            val result = Bundle().apply {
+                putStringArrayList(SCAN_RESULT, arrayListOf(results[0]))
+            }
+            parentFragmentManager.setFragmentResult(SCAN_REQUEST, result)
         }
     }
 
@@ -174,9 +180,19 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         @Suppress("DEPRECATION")
         builder.setTargetResolution(defaultResolution)
         analysisUseCase = builder.build()
-        analysisUseCase?.setAnalyzer(ContextCompat.getMainExecutor(requireActivity().applicationContext)) {
+        analysisUseCase?.setAnalyzer(ContextCompat.getMainExecutor(requireActivity().applicationContext)) { imageProxy ->
             try {
-                imageProcessor?.processImageProxy(it)
+                val rotationDegrees: Int = imageProxy.imageInfo.rotationDegrees
+                if (rotationDegrees == 0 || rotationDegrees == 180) {
+                    graphicOverlay.setImageSourceInfo(
+                        imageProxy.width, imageProxy.height
+                    )
+                } else {
+                    graphicOverlay.setImageSourceInfo(
+                        imageProxy.height, imageProxy.width
+                    )
+                }
+                imageProcessor?.processImageProxy(imageProxy, graphicOverlay)
             } catch (e: MlKitException) {
                 e.printStackTrace()
             }
@@ -231,17 +247,6 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
     companion object {
         const val SCAN_RESULT = "scan_result"
         const val SCAN_REQUEST = "scan_request"
-        const val IS_HAND_SCAN_MODE = "isHandScanMode"
-
-        fun newInstance(isHandScanMode: Boolean): BarcodeScannerFragment {
-            val fragment = BarcodeScannerFragment()
-            val args = Bundle().apply {
-                putBoolean(IS_HAND_SCAN_MODE, isHandScanMode)
-            }
-            fragment.arguments = args
-            return fragment
-        }
-
     }
 
 }
