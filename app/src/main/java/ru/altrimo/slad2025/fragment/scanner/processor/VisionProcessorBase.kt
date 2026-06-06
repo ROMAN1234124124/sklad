@@ -1,17 +1,13 @@
 package ru.altrimo.slad2025.fragment.scanner.processor
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
-import android.content.Context
 import androidx.camera.core.ImageProxy
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.vision.common.InputImage
 
-abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
+abstract class VisionProcessorBase<T> : VisionImageProcessor {
 
-    private var activityManager: ActivityManager =
-        context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     private val executor = ScopedExecutor(TaskExecutors.MAIN_THREAD)
 
     private var isShutdown = false

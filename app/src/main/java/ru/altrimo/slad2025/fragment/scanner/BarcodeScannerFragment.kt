@@ -90,7 +90,10 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
 
 
     override fun onBarcodes(results: List<String>) {
-        Log.d("Scanner", "onBarcodes called with results: $results, isComputerVision=${isComputerVision.get()}, imgQrBox=${binding.imgQrBox.isVisible}")
+        Log.d(
+            "Scanner",
+            "onBarcodes called with results: $results, isComputerVision=${isComputerVision.get()}, imgQrBox=${binding.imgQrBox.isVisible}"
+        )
         if (results.isEmpty()) return
         if (isComputerVision.get()) {
             beep()
@@ -174,7 +177,7 @@ class BarcodeScannerFragment : ViewBindingFragment<FragmentBarcodeScannerBinding
         if (imageProcessor != null) {
             imageProcessor!!.stop()
         }
-        imageProcessor = BarcodeScannerProcessor(requireActivity().applicationContext, this)
+        imageProcessor = BarcodeScannerProcessor(this)
         val builder = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         @Suppress("DEPRECATION")

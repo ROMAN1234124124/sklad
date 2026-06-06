@@ -1,20 +1,30 @@
 package ru.altrimo.slad2025.fragment.scanner.processor
 
-import android.content.Context
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 
 class BarcodeScannerProcessor(
-    context: Context,
     private val barcodeScannerListener: BarcodeScannerListener
-) : VisionProcessorBase<List<Barcode>>(context) {
+) : VisionProcessorBase<List<Barcode>>() {
 
-    private val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
+    private val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient(
+        BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+            .enableAllPotentialBarcodes()
+            .build()
+    )
     private var job: Job
     private val processSet = mutableSetOf<String>()
 
@@ -32,15 +42,16 @@ class BarcodeScannerProcessor(
             action()
         }
     }
+
     /**
      * Возвращает очень много результатов меньше чем за секунду,
-     * кешируем уникальные значения, накопившиеся за секунду.
+    //     * кешируем уникальные значения, накопившиеся за секунду.
      */
     init {
         job = CoroutineScope(Dispatchers.Default).launchPeriodicAsync(1000) {
-            Log.d(TAG,"processSet1 $processSet")
+            Log.d(TAG, "processSet1 $processSet")
             if (processSet.isNotEmpty()) {
-                Log.d(TAG,"processSet12 $processSet")
+                Log.d(TAG, "processSet12 $processSet")
                 withContext(Dispatchers.Main) {
                     barcodeScannerListener.onBarcodes(processSet.toList())
                 }
